@@ -1,0 +1,11 @@
+{
+    "BA": {
+        "ccitt5": true
+    },
+    "AA": {
+        "ccitt5": false
+    },
+    "XR": {
+        "ccitt5": true
+    }
+}
