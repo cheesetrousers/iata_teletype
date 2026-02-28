@@ -77,4 +77,12 @@ FLIGHT DELAYED DUE TO WEATHER<CR><LF>
 ## Phase 5: Beer O'Clock
 - [X] Shut down the emulator.
 - [X] Close the workspace.
-- [X] Celebrate successfully implementing complex IATA logic and testing a fully distributed architecture locally.
+## Phase 6: EOT Support & TUI Enhancement
+- [X] Add `eot_enabled` flag to `address_config.json` (defaults to `false`).
+- [X] Define EOT string as `<CR><LF><EOT>` (where EOT is `\x04`).
+- [X] Update `IataMessageBuilder` to append the EOT string if configured for the destination.
+- [X] Enhance TUI with a dynamic configuration display window:
+    - [X] Triggers after 7 characters of destination have been entered.
+    - [X] Shows current encoding (CCITT5) and EOT settings for that destination suffix.
+- [X] Expand test suite with test cases involving EOT-enabled destinations.
+- [X] Validate end-to-end flow from API to TUI with EOT characters.

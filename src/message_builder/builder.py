@@ -17,8 +17,23 @@ class IataMessageBuilder:
     ETX = "\x03"  # End of Text
     CR = "\r"     # Carriage Return
     LF = "\n"     # Line Feed
+    EOT = "\x04"    # End of Transmission
     
     CONFIG_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "config", "address_config.json")
+
+    @classmethod
+    def get_rule(cls, destination: str) -> dict:
+        """
+        Retrieves the rule for a given destination based on its last 2 characters.
+        """
+        dest_suffix = destination[-2:].upper() if len(destination) >= 2 else destination.upper()
+        config = cls.load_config()
+        rule = config.get(dest_suffix, {})
+        return {
+            "ccitt5": rule.get("ccitt5", True),
+            "eot_enabled": rule.get("eot_enabled", False),
+            "suffix": dest_suffix
+        }
 
     @classmethod
     def load_config(cls) -> dict:
@@ -48,8 +63,10 @@ class IataMessageBuilder:
         # Read the CCITT5 rule using the last 2 characters of the destination
         dest_suffix = destination[-2:].upper() if len(destination) >= 2 else destination.upper()
         config = cls.load_config()
-        # Default is True if not found
-        use_ccitt5 = config.get(dest_suffix, {}).get("ccitt5", True)
+        # Default is True for CCITT5 and False for EOT if not found
+        rule = config.get(dest_suffix, {})
+        use_ccitt5 = rule.get("ccitt5", True)
+        eot_enabled = rule.get("eot_enabled", False)
         
         logger.info(f"Building Teletype Message -> Dest: {destination}, Orig: {origin}")
         logger.info(f"CCITT5 Translation enabled for suffix '{dest_suffix}': {use_ccitt5}")
@@ -84,4 +101,8 @@ class IataMessageBuilder:
             message += tag + crlf
             
         message += body + crlf + cls.ETX
+        
+        if eot_enabled:
+            message += crlf + cls.EOT
+            
         return message
