@@ -36,3 +36,5 @@ Run the full test suite to verify the message builder and API:
 ```bash
 uv run pytest
 ```
+## Context & Guidelines
+A detailed context document for AI agents and maintainers is available at [.agent/context.md](.agent/context.md). It includes guidelines on testing with `pytest`, mocking with `monkeypatch`, and configuration management for destination rules.

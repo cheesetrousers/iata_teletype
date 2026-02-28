@@ -1,11 +1,14 @@
 {
     "BA": {
-        "ccitt5": true
+        "ccitt5": true,
+        "eot_enabled": false
     },
     "AA": {
-        "ccitt5": false
+        "ccitt5": false,
+        "eot_enabled": false
     },
     "XR": {
-        "ccitt5": true
+        "ccitt5": true,
+        "eot_enabled": true
     }
 }

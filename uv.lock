@@ -350,7 +350,7 @@ wheels = [
 
 [[package]]
 name = "iata-teletype"
-version = "0.1.0"
+version = "0.3.0"
 source = { virtual = "." }
 dependencies = [
     { name = "fastapi" },

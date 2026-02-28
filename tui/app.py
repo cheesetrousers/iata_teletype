@@ -3,7 +3,8 @@ import httpx
 import asyncio
 from textual.app import App, ComposeResult
 from textual.containers import Container, Horizontal, Vertical
-from textual.widgets import Header, Footer, Input, Log, Button, Label, TextArea
+from textual.widgets import Header, Footer, Input, Log, Button, Label, TextArea, Static
+from message_builder.builder import IataMessageBuilder
 from textual import work
 from google.cloud import pubsub_v1
 
@@ -22,7 +23,11 @@ class TeletypeApp(App):
 
     def compose(self) -> ComposeResult:
         yield Header(show_clock=True)
-        yield Log(id="output-log")
+        with Horizontal(id="main-view"):
+            yield Log(id="output-log")
+            with Vertical(id="config-window"):
+                yield Label("Destination Config", id="config-title")
+                yield Static("Enter 7 chars...", id="config-content")
         
         with Container(id="input-form"):
             yield Label("Teletype Sender (Enter file:path.txt in Body to load from file)", id="form-label")
@@ -74,6 +79,7 @@ class TeletypeApp(App):
                 raw_data.replace('\x01', '<SOH>')
                 .replace('\x02', '<STX>')
                 .replace('\x03', '<ETX>')
+                .replace('\x04', '<EOT>')
                 .replace('\r', '<CR>')
                 .replace('\n', '<LF>\n')
             )
@@ -134,6 +140,20 @@ class TeletypeApp(App):
             if ord_key: payload["ordering_key"] = ord_key
 
             self.call_api(payload)
+
+    def on_input_changed(self, event: Input.Changed):
+        if event.input.id == "in-dest":
+            val = event.value.strip()
+            if len(val) >= 7:
+                rule = IataMessageBuilder.get_rule(val)
+                content = (
+                    f"Suffix: \[ {rule['suffix']} ]\n"
+                    f"CCITT5: {'[yellow]TRUE[/]' if rule['ccitt5'] else '[green]FALSE[/]'}\n"
+                    f"EOT:    {'[red]ENABLED[/]' if rule['eot_enabled'] else '[green]DISABLED[/]'}"
+                )
+                self.query_one("#config-content", Static).update(content)
+            else:
+                self.query_one("#config-content", Static).update("Enter 7 chars...")
 
 def run():
     app = TeletypeApp()

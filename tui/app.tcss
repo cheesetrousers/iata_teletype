@@ -2,12 +2,38 @@ Screen {
     background: $surface-darken-1;
 }
 
+#main-view {
+    height: 1fr;
+}
+
 #output-log {
+    width: 3fr;
     height: 1fr;
     border: solid green;
     padding: 1;
     color: #33ff33;
     background: black;
+}
+
+#config-window {
+    width: 1fr;
+    height: 1fr;
+    border: solid yellow;
+    background: $surface;
+    padding: 1;
+}
+
+#config-title {
+    text-align: center;
+    background: $primary;
+    color: white;
+    text-style: bold;
+    margin-bottom: 1;
+}
+
+#config-content {
+    color: white;
+    text-style: italic;
 }
 
 #input-form {
