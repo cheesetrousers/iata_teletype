@@ -11,30 +11,28 @@ You can spin up the mock Google Pub/Sub topic on your WSL environment using Podm
 ```bash
 podman run -d --name pubsub-emulator -p 8085:8085 gcr.io/google.com/cloudsdktool/google-cloud-cli:emulators gcloud beta emulators pubsub start --project=iata-teletype-project --host-port=0.0.0.0:8085
 ```
-Or, if you have `podman-compose` installed, you can still use the included `.yml` file:
+Or, if you have `podman-compose` installed, you can use the included configuration:
 ```bash
-podman-compose up -d
+podman-compose -f infra/docker-compose.yml up -d
 ```
 
 ## 2. Start the FastAPI System
 Start the FastAPI REST Publisher which listens on port `8000`:
 ```bash
-uv run uvicorn main:app --reload
+uv run teletype-api
 ```
-You can now send POST requests either directly via `curl` or through the interactive TUI.
 The API is available at `POST http://localhost:8000/messages/teletype`.
 
 ## 3. Start the Textual Receiver TUI
-Open a standalone terminal window (or a new Tmux pane) and run the TUI to listen to the Pub/Sub Emulator and send CLI messages safely:
+Open a standalone terminal window and run the TUI to visualize the Pub/Sub stream and test message sending:
 ```bash
-uv run python tui.py
+uv run teletype-tui
 ```
-*(Optionally you can run it via `uv run textual run tui.py`)*
 
-In the UI, you can send direct messages. Instead of typing the body manually, enter `file:filename.txt` in the body field to inject the contents of a local file.
+In the UI, you can send messages manually. To load content from a file, type `file:path/to/file.txt` in the body field.
 
 ## Testing
-Run the pytest suite to verify builder functions and formatting strings:
+Run the full test suite to verify the message builder and API:
 ```bash
-uv run pytest test_builder.py
+uv run pytest
 ```

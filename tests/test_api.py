@@ -2,11 +2,11 @@ import pytest
 from fastapi.testclient import TestClient
 from unittest.mock import patch, MagicMock
 
-from main import app
+from message_builder.api import app
 
 @pytest.fixture
 def mock_publisher():
-    with patch("main.pubsub_v1.PublisherClient") as mock_client_cls:
+    with patch("message_builder.api.pubsub_v1.PublisherClient") as mock_client_cls:
         mock_client = MagicMock()
         mock_client_cls.return_value = mock_client
         

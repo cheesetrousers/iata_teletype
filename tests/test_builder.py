@@ -1,9 +1,9 @@
 import pytest
 from unittest.mock import patch
 from datetime import datetime, timezone
-from builder import IataMessageBuilder
+from message_builder.builder import IataMessageBuilder
 
-@patch('builder.datetime')
+@patch('message_builder.builder.datetime')
 def test_builder_basic_message(mock_datetime):
     # Mock datetime to a specific UTC time
     mock_datetime.now.return_value = datetime(2023, 10, 15, 14, 30, tzinfo=timezone.utc)
@@ -21,7 +21,7 @@ def test_builder_basic_message(mock_datetime):
     assert ".JFKYYBA 151430" in msg
     assert "FLIGHT DELAYED " in msg # "Flight@Delayed!" becomes "FLIGHT DELAYED " 
 
-@patch('builder.datetime')
+@patch('message_builder.builder.datetime')
 def test_builder_with_tag(mock_datetime):
     mock_datetime.now.return_value = datetime(2023, 10, 15, 14, 30, tzinfo=timezone.utc)
     mock_datetime.timezone = timezone
@@ -32,7 +32,7 @@ def test_builder_with_tag(mock_datetime):
     assert "\x02\r\nOPT TAG\r\nBODY" in msg # "opt_tag" translates to "OPT TAG" due to '_' replacement
 
 
-@patch('builder.datetime')
+@patch('message_builder.builder.datetime')
 def test_builder_disable_ccitt5(mock_datetime):
     mock_datetime.now.return_value = datetime(2023, 10, 15, 14, 30, tzinfo=timezone.utc)
     mock_datetime.timezone = timezone

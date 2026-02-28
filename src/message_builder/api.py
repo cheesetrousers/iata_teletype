@@ -4,7 +4,7 @@ from typing import Optional
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from google.cloud import pubsub_v1
-from builder import IataMessageBuilder
+from .builder import IataMessageBuilder
 
 # Force use of emulator for Google Cloud SDK
 os.environ["PUBSUB_EMULATOR_HOST"] = "localhost:8085"
@@ -71,3 +71,10 @@ async def publish_teletype(payload: TeletypePayload):
     
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+def run():
+    import uvicorn
+    uvicorn.run("message_builder.api:app", host="0.0.0.0", port=8000, reload=True)
+
+if __name__ == "__main__":
+    run()

@@ -18,7 +18,7 @@ class IataMessageBuilder:
     CR = "\r"     # Carriage Return
     LF = "\n"     # Line Feed
     
-    CONFIG_PATH = os.path.join(os.path.dirname(__file__), "address_config.json")
+    CONFIG_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "config", "address_config.json")
 
     @classmethod
     def load_config(cls) -> dict:

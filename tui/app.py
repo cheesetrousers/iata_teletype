@@ -135,6 +135,9 @@ class TeletypeApp(App):
 
             self.call_api(payload)
 
-if __name__ == "__main__":
+def run():
     app = TeletypeApp()
     app.run()
+
+if __name__ == "__main__":
+    run()
