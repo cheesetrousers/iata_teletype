@@ -1,10 +1,14 @@
-import os
+import logging
 from contextlib import asynccontextmanager
-from typing import Optional
+from typing import Optional, Dict
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from google.cloud import pubsub_v1
 from .builder import IataMessageBuilder
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger("iata_api")
 
 # Force use of emulator for Google Cloud SDK
 os.environ["PUBSUB_EMULATOR_HOST"] = "localhost:8085"
@@ -34,16 +38,33 @@ async def lifespan(app: FastAPI):
     # Try explicitly creating to ensure topic exists in the mock environment
     try:
         publish_client.create_topic(request={"name": topic_path})
-        print(f"Created Topic: {topic_path} on Emulator.")
+        logger.info(f"Created Topic: {topic_path} on Emulator.")
     except Exception as e:
-        print(f"Assuming topic already exists or could not create: {e}")
+        logger.debug(f"Assuming topic already exists or could not create: {e}")
 
     yield
 
     if publish_client:
-        print("Shutting down pubsub client...")
+        logger.info("Shutting down pubsub client...")
 
 app = FastAPI(lifespan=lifespan, title="IATA Teletype API")
+
+@app.get("/health")
+async def health_check() -> Dict[str, str]:
+    """
+    Service health check endpoint.
+    """
+    health_status = {"status": "healthy", "service": "iata-teletype-api"}
+    
+    # Check if configurations can be loaded
+    try:
+        IataMessageBuilder.load_config()
+        health_status["config"] = "ok"
+    except Exception as e:
+        health_status["config"] = f"error: {str(e)}"
+        health_status["status"] = "unhealthy"
+        
+    return health_status
 
 @app.post("/messages/teletype")
 async def publish_teletype(payload: TeletypePayload):
@@ -65,11 +86,11 @@ async def publish_teletype(payload: TeletypePayload):
             data=ascii_msg.encode("utf-8"),
             ordering_key=ord_key
         )
-        message_id = future.result()
-        
+        logger.info(f"Published message ID: {message_id} with ordering key: {ord_key}")
         return {"status": "success", "message_id": message_id, "ordering_key": ord_key}
     
     except Exception as e:
+        logger.error(f"Error publishing message: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 def run():

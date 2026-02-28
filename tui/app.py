@@ -28,6 +28,8 @@ class TeletypeApp(App):
             with Vertical(id="config-window"):
                 yield Label("Destination Config", id="config-title")
                 yield Static("Enter 7 chars...", id="config-content")
+                yield Label("System Status", id="status-title")
+                yield Static("🔴 Offline", id="status-indicator")
         
         with Container(id="input-form"):
             yield Label("Teletype Sender (Enter file:path.txt in Body to load from file)", id="form-label")
@@ -64,7 +66,9 @@ class TeletypeApp(App):
                 "enable_message_ordering": True
             })
             self.log_widget.write_line(f"[System] Subscribed using ordering keys on {SUB_ID}.")
+            self.query_one("#status-indicator", Static).update("🟢 Online (Subscribed)")
         except Exception as e:
+            self.query_one("#status-indicator", Static).update(f"🔴 Fail: {str(e)[:15]}...")
             pass
 
     @work(exclusive=True, thread=True)

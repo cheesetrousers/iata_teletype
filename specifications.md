@@ -86,3 +86,16 @@ FLIGHT DELAYED DUE TO WEATHER<CR><LF>
     - [X] Shows current encoding (CCITT5) and EOT settings for that destination suffix.
 - [X] Expand test suite with test cases involving EOT-enabled destinations.
 - [X] Validate end-to-end flow from API to TUI with EOT characters.
+
+## Phase 7: Monitoring & Observability
+- [ ] Implement a `/health` endpoint in the FastAPI service to monitor system readiness.
+- [ ] Add structured JSON logging across the API and Message Builder for better log aggregation.
+- [ ] Integrate a **Heartbeat Mechanism** in the TUI to visualize the health of the Pub/Sub subscriber connection.
+- [ ] (Optional) Add Prometheus metrics to track message throughput and delivery latency.
+
+---
+
+# Maintenance Backlog
+- [ ] **Config Caching**: Refactor `IataMessageBuilder.load_config` to cache the configuration in a class variable to avoid frequent disk I/O, especially for the TUI's dynamic lookup feature.
+- [ ] **Address Validation**: Add stricter validation for the 7-character IATA address format.
+- [ ] **Resilience**: Implement auto-reconnect logic for the Pub/Sub subscriber in case of emulator timeout or network issues.

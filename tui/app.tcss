@@ -34,6 +34,21 @@ Screen {
 #config-content {
     color: white;
     text-style: italic;
+    margin-bottom: 2;
+}
+
+#status-title {
+    text-align: center;
+    background: $secondary;
+    color: white;
+    text-style: bold;
+    margin-bottom: 1;
+}
+
+#status-indicator {
+    padding: 1;
+    text-align: center;
+    background: $surface-darken-1;
 }
 
 #input-form {
