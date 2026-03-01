@@ -95,6 +95,18 @@ FLIGHT DELAYED DUE TO WEATHER<CR><LF>
 
 ---
 
+## Phase 8: Containerization & Remote Deployment
+- [ ] **Dockerfile Creation**: Develop a multi-stage Dockerfile targeting a minimal Python 3.14-slim runtime.
+- [ ] **Pub/Sub Remote Deployment**: Deploy the Google Cloud Pub/Sub emulator on the Synology NAS using Podman/Docker to serve as the remote message broker for both the remote API and local TUI.
+- [ ] **Nexus Integration**: Configure the local Nexus repository on the Synology NAS as a private Docker registry.
+- [ ] **Local Build Pipeline**: Create a Jenkinsfile or a local build script to automate the `docker build`, `tag`, and `push` to the local Nexus registry.
+- [ ] **Synology Deployment**: Deploy the FastAPI message builder on the NAS using the Synology Container Manager (Docker) plugin, pulling directly from the local Nexus.
+- [ ] **Environment Configuration**: Set up environment variables within the container (e.g., `PROJECT_ID`, `PUBSUB_EMULATOR_HOST`) to ensure the remote container can communicate with the Pub/Sub emulator.
+- [ ] **Remote Verification**: Validate that the remote API is reachable and correctly publishes messages from the NAS back to the local subscriber (or a remote one).
+- [ ] **Security**: Ensure no exposure to public GitHub (use local registry and local Jenkins/webhook).
+
+---
+
 # Maintenance Backlog
 - [ ] **Config Caching**: Refactor `IataMessageBuilder.load_config` to cache the configuration in a class variable to avoid frequent disk I/O, especially for the TUI's dynamic lookup feature.
 - [ ] **Address Validation**: Add stricter validation for the 7-character IATA address format.

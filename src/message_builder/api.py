@@ -1,3 +1,4 @@
+import os
 import logging
 from contextlib import asynccontextmanager
 from typing import Optional, Dict
@@ -86,6 +87,7 @@ async def publish_teletype(payload: TeletypePayload):
             data=ascii_msg.encode("utf-8"),
             ordering_key=ord_key
         )
+        message_id = future.result()
         logger.info(f"Published message ID: {message_id} with ordering key: {ord_key}")
         return {"status": "success", "message_id": message_id, "ordering_key": ord_key}
     
