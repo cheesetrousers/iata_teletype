@@ -21,6 +21,11 @@ class TeletypeApp(App):
         ("ctrl+q", "quit", "Quit"),
     ]
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.subscriber_future = None
+        self.subscriber_client = None
+
     def compose(self) -> ComposeResult:
         yield Header(show_clock=True)
         with Horizontal(id="main-view"):
@@ -73,8 +78,6 @@ class TeletypeApp(App):
 
     @work(exclusive=True, thread=True)
     def start_listening(self):
-        subscriber = pubsub_v1.SubscriberClient()
-        subscription_path = subscriber.subscription_path(PROJECT_ID, SUB_ID)
 
         def callback(message):
             raw_data = message.data.decode("utf-8", errors="replace")
@@ -98,10 +101,26 @@ class TeletypeApp(App):
         try:
             # We must use threading / block for subscriber to continuously poll in textual's worker
             self.log_widget.write_line("[System] Listening for PubSub messages...")
-            future = subscriber.subscribe(subscription_path, callback=callback)
-            future.result()
+            self.subscriber_client = pubsub_v1.SubscriberClient()
+            subscription_path = self.subscriber_client.subscription_path(PROJECT_ID, SUB_ID)
+            self.subscriber_future = self.subscriber_client.subscribe(subscription_path, callback=callback)
+            
+            # This blocks the worker thread until the future is cancelled or errors
+            try:
+                self.subscriber_future.result()
+            except Exception as e:
+                # Normal cancellation or error
+                pass
         except Exception as e:
             self.call_from_thread(self.log_widget.write_line, f"[Error] PubSub listen error: {e}")
+
+    async def action_quit(self) -> None:
+        """Handle graceful exit."""
+        if self.subscriber_future:
+            self.subscriber_future.cancel()
+        if self.subscriber_client:
+            self.subscriber_client.close()
+        await super().action_quit()
 
     @work(exclusive=True, thread=False)
     async def call_api(self, payload: dict):
