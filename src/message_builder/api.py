@@ -11,11 +11,11 @@ from .builder import IataMessageBuilder
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger("iata_api")
 
-# Force use of emulator for Google Cloud SDK
-os.environ["PUBSUB_EMULATOR_HOST"] = "localhost:8085"
+# Force use of emulator for Google Cloud SDK if not specified
+os.environ.setdefault("PUBSUB_EMULATOR_HOST", "localhost:8085")
 
-PROJECT_ID = "iata-teletype-project"
-TOPIC_ID = "teletype-messages"
+PROJECT_ID = os.environ.get("PROJECT_ID", "iata-teletype-project")
+TOPIC_ID = os.environ.get("TOPIC_ID", "teletype-messages")
 
 class TeletypePayload(BaseModel):
     destination: str

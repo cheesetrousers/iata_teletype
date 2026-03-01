@@ -8,10 +8,10 @@ from message_builder.builder import IataMessageBuilder
 from textual import work
 from google.cloud import pubsub_v1
 
-os.environ["PUBSUB_EMULATOR_HOST"] = "localhost:8085"
-PROJECT_ID = "iata-teletype-project"
-TOPIC_ID = "teletype-messages"
-SUB_ID = "teletype-sub"
+os.environ.setdefault("PUBSUB_EMULATOR_HOST", "localhost:8085")
+PROJECT_ID = os.environ.get("PROJECT_ID", "iata-teletype-project")
+TOPIC_ID = os.environ.get("TOPIC_ID", "teletype-messages")
+SUB_ID = os.environ.get("SUB_ID", "teletype-sub")
 
 API_URL = "http://localhost:8000/messages/teletype"
 
