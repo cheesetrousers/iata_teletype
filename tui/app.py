@@ -64,6 +64,7 @@ class TeletypeApp(App):
         subscriber = pubsub_v1.SubscriberClient()
         subscription_path = subscriber.subscription_path(PROJECT_ID, SUB_ID)
         
+        from google.api_core import exceptions
         try:
             subscriber.create_subscription(request={
                 "name": subscription_path, 
@@ -72,9 +73,12 @@ class TeletypeApp(App):
             })
             self.log_widget.write_line(f"[System] Subscribed using ordering keys on {SUB_ID}.")
             self.query_one("#status-indicator", Static).update("🟢 Online (Subscribed)")
+        except exceptions.AlreadyExists:
+            self.log_widget.write_line(f"[System] Attached to existing subscription {SUB_ID}.")
+            self.query_one("#status-indicator", Static).update("🟢 Online (Connected)")
         except Exception as e:
+            self.log_widget.write_line(f"[Error] Subscription failed: {e}")
             self.query_one("#status-indicator", Static).update(f"🔴 Fail: {str(e)[:15]}...")
-            pass
 
     @work(exclusive=True, thread=True)
     def start_listening(self):
@@ -170,7 +174,7 @@ class TeletypeApp(App):
             if len(val) >= 7:
                 rule = IataMessageBuilder.get_rule(val)
                 content = (
-                    f"Suffix: \[ {rule['suffix']} ]\n"
+                    f"Suffix: \\[ {rule['suffix']} ]\n"
                     f"CCITT5: {'[yellow]TRUE[/]' if rule['ccitt5'] else '[green]FALSE[/]'}\n"
                     f"EOT:    {'[red]ENABLED[/]' if rule['eot_enabled'] else '[green]DISABLED[/]'}"
                 )

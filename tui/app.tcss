@@ -21,6 +21,7 @@ Screen {
     border: solid yellow;
     background: $surface;
     padding: 1;
+    overflow-y: auto;
 }
 
 #config-title {
